@@ -56,13 +56,13 @@ function postData() {
 }
 function putPatchData() {
 
-//     // PUT seçilen id deki bütün içeriği siler yeni bir içerik üretir
-//     axios.put('https://jsonplaceholder.typicode.com/users/1',{
-//     name:'Selman Jir CAN',
-//     userName : 'selmanjir',
-//     email :'random@gmail.com'
-// }).then(response => sonucuEkranaYazdir(response))
-// .catch(hata => console.log(hata))
+    //     // PUT seçilen id deki bütün içeriği siler yeni bir içerik üretir
+    //     axios.put('https://jsonplaceholder.typicode.com/users/1',{
+    //     name:'Selman Jir CAN',
+    //     userName : 'selmanjir',
+    //     email :'random@gmail.com'
+    // }).then(response => sonucuEkranaYazdir(response))
+    // .catch(hata => console.log(hata))
     axios.patch('https://jsonplaceholder.typicode.com/users/1',{
         name:'Selman Jir CAN',
         userName :'selmanjir',
@@ -100,20 +100,53 @@ axios.interceptors.request.use(config => {
 
     return config;
 });
+
+// axios için default değeri tanımlama.
+axios.defaults.headers.common['X-Auth-Token'] = 'apitokendegeri';
+axios.defaults.headers.common['MyToken'] = 'mytoken';
+
+// heryerde kullanabilceğim default değerleri olan axios nesnesi.
+const myAxios = axios.create({
+    baseURL : 'https://jsonplaceholder.typicode.com',
+    headers : {'X-Requested-Width' : 'XMLHttpRequest', 'token' : 'anotherDefaultToken'}
+})
+
+// Yetkilendirme için ayrılmış alan
 function customHeader() {
-    console.log("custom header olusturma");
+
+    myAxios.get('/users').then(response => console.log(response));
+
+    const config = {
+
+        headers: {
+            'Content-Type' : 'application.json',
+            Authorization: 'sizintokendegeriniz'
+        }
+
+    }
+
+    axios.post('https://jsonplaceholder.typicode.com/users',{
+        name: 'Selman Jir CAN',
+        username: 'selmanjir',
+        email:'sjc@gmail.com'
+    },config).then(response => sonucuEkranaYazdir(response))
+        .catch(hata => console.log(hata))
 }
 function hataIslemleri() {
-    console.log("hata işlemleri");
+    axios('https://jsonplaceholder.typicode.com/userssss?_limit=1')
+        .then(response => sonucuEkranaYazdir(response))
+        .catch(hata => hatayiYazdir(hata))
+        .then(() => console.log('get istediği tamamlandı'))
 }
 
-function hatayiYazdir(error) {
-    console.log(error);
-    document.querySelector('sonuc').innerHTML=` 
-    <div class="notification is-info">
+function hatayiYazdir(hata) {
+
+    document.querySelector('.sonuc').innerHTML = ` <div class="notification is-info">
     <div class="columns is-mobile is-vcentered">
     <div class="column"><h1 class="subtitle">Sonuc</h1></div>
-    <div class="column"><h1 class="title">${error}</h1></div>
+    <div class="column"><h1 class="title>
+    <pre>${JSON.stringify(hata.response.headers, null, 2)}</pre>
+    </h1></div>
     </div>
     </div>`;
 }
