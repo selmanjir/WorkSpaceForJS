@@ -1,6 +1,7 @@
 const getBtn = document.getElementById('get');
 const postBtn = document.getElementById('post');
 const putPatchBtn = document.getElementById('put-patch');
+const deleteBtn = document.getElementById('delete');
 const ayniAndaIstekBtn = document.getElementById('ayni-anda-istek');
 const headerBtn = document.getElementById('headers');
 const hataBtn = document.getElementById('hata');
@@ -8,6 +9,7 @@ const hataBtn = document.getElementById('hata');
 getBtn.addEventListener('click',getData);
 postBtn.addEventListener('click',postData);
 putPatchBtn.addEventListener('click',putPatchData);
+deleteBtn.addEventListener('click',deleteItem);
 ayniAndaIstekBtn.addEventListener('click',ayniAndaIstekHata);
 headerBtn.addEventListener('click',customHeader);
 hataBtn.addEventListener('click',hataIslemleri);
@@ -19,11 +21,11 @@ function getData() {
     //     params : {
     //         _limit:2
     //     }
-    
+
     // }).then(response => sonucuEkranaYazdir(response))
     // .catch(hata => console.log(hata))
     // .then(() => console.log('get isteği tamamlandı'))
-    
+
     // axios
     // .get('https://jsonplaceholder.typicode.com/users',{
     //     params: {
@@ -34,9 +36,9 @@ function getData() {
     // .catch(hata => console.log(hata))
     // .then(() => console.log('get isteği tamamlandı'))
     axios('https://jsonplaceholder.typicode.com/users?_limit=1')
-    .then(response => sonucuEkranaYazdir(response))
-    .catch(hata => console.log(hata))
-    .then(() => console.log('get isteği tamamlandı'))
+        .then(response => sonucuEkranaYazdir(response))
+        .catch(hata => console.log(hata))
+        .then(() => console.log('get isteği tamamlandı'))
 }
 function postData() {
     //     axios.post('https://jsonplaceholder.typicode.com/posts',{
@@ -46,18 +48,58 @@ function postData() {
     // }).then(response => sonucuEkranaYazdir(response))
     // .catch(hata => console.log(hata));
     axios.post('https://jsonplaceholder.typicode.com/users',{
-    name: 'Selman Jir CAN',
-    username: 'selmanjir',
-    email:'sjc@gmail.com'
-}).then(response => sonucuEkranaYazdir(response))
-.catch(hata => console.log(hata))
+        name: 'Selman Jir CAN',
+        username: 'selmanjir',
+        email:'sjc@gmail.com'
+    }).then(response => sonucuEkranaYazdir(response))
+        .catch(hata => console.log(hata))
 }
 function putPatchData() {
-    console.log("put patch data");
+
+//     // PUT seçilen id deki bütün içeriği siler yeni bir içerik üretir
+//     axios.put('https://jsonplaceholder.typicode.com/users/1',{
+//     name:'Selman Jir CAN',
+//     userName : 'selmanjir',
+//     email :'random@gmail.com'
+// }).then(response => sonucuEkranaYazdir(response))
+// .catch(hata => console.log(hata))
+    axios.patch('https://jsonplaceholder.typicode.com/users/1',{
+        name:'Selman Jir CAN',
+        userName :'selmanjir',
+        email :'random@gmail.com'
+    }).then(response => sonucuEkranaYazdir(response))
+        .catch(hata => console.log(hata))
+}
+function deleteItem(){
+    axios.delete('https://jsonplaceholder.typicode.com/users/1')
+        .then(response => sonucuEkranaYazdir(response))
+        .catch(hata => console.log(hata))
 }
 function ayniAndaIstekHata() {
-    console.log("ayni anda istek işlemleri");
+    // axios.all([
+    //     get('https://jsonplaceholder.typicode.com/users'),
+    //     get('https://jsonplaceholder.typicode.com/posts')
+    // ]).then(response => {
+    //     console.log(response[0].data)
+    //     console.log(response[1].data)
+    //     sonucuEkranaYazdir(response[0])
+    // })
+    axios.all([
+        get('https://jsonplaceholder.typicode.com/users'),
+        get('https://jsonplaceholder.typicode.com/posts')
+    ]).then(axios.spread((kullanıcılar,postlar) =>{
+        console.log(kullanıcılar.data);
+        console.log(postlar.data);
+        sonucuEkranaYazdir(kullanıcılar)
+    }))
 }
+// interceptors istek henüz gitmeden çalışmasını istediğimiz blok
+
+axios.interceptors.request.use(config => {
+    console.log(`${config.url} adresine ${config.method} istediği yapıldı ve timeout olarak ${config.timeout} ayarlandı`);
+
+    return config;
+});
 function customHeader() {
     console.log("custom header olusturma");
 }
@@ -73,7 +115,7 @@ function hatayiYazdir(error) {
     <div class="column"><h1 class="subtitle">Sonuc</h1></div>
     <div class="column"><h1 class="title">${error}</h1></div>
     </div>
-    </div>`;   
+    </div>`;
 }
 
 function sonucuEkranaYazdir(response) {
